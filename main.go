@@ -22,11 +22,6 @@ type Config struct {
 
 func main() {
 
-	// Cetak env inti untuk verifikasi (sementara; hapus di prod)
-	log.Println("DETECT RAILWAY:", os.Getenv("RAILWAY_PROJECT_ID"), os.Getenv("RAILWAY_ENVIRONMENT"))
-	log.Println("RAW PORT:", os.Getenv("PORT"))
-	log.Println("RAW DB_CONN:", os.Getenv("DB_CONN"))
-
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
@@ -41,7 +36,6 @@ func main() {
 	}
 
 	fmt.Println("PORT: ", config.Port)
-	fmt.Println("DB_CONN: ", config.DBConn)
 
 	// Setup database
 	db, err := database.InitDB(config.DBConn)
