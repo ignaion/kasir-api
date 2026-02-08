@@ -31,3 +31,14 @@ CREATE TABLE IF NOT EXISTS transaction_details (
     quantity INT NOT NULL,
     subtotal INT NOT NULL
 );
+
+
+func (repo *TransactionRepository) summaryToday() (*models.SummaryToday, error) {
+	queryTotalTransaksi := `
+			SELECT COUNT(*) as total 
+			FROM transactions t
+			WHERE t.created_at::date = CURRENT_DATE;
+	`
+
+	
+}

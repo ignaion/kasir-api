@@ -23,3 +23,9 @@ type CheckoutItem struct {
 	ProductID int `json:"product_id"`
 	Quantity  int `json:"quantity"`
 }
+
+type SummaryToday struct {
+	TotalRevenue   int     `json:"total_revenue"`
+	TotalTransaksi int     `json:"total_transaksi"`
+	ProdukTerlaris Product `json:"produk_terlaris"`
+}

@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"kasir-api/models"
 	"kasir-api/services"
 	"net/http"
+	"time"
 )
 
 type TransactionHandler struct {
@@ -41,4 +43,47 @@ func (h *TransactionHandler) Checkout(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(transaction)
+}
+
+func (h *TransactionHandler) SummaryToday(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 3*time.Second)
+	defer cancel()
+
+	summary, err := h.service.GetSummaryToday(ctx)
+	if err != nil {
+		http.Error(w, "failed to get today summary: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	type bestProduct struct {
+		Nama       string `json:"nama"`
+		QtyTerjual int    `json:"qty_terjual"`
+	}
+
+	bpNama := ""
+	bpQty := 0
+	{
+		nama, qty, e := h.service.GetBestSellerToday(ctx)
+		if e == nil {
+			bpNama = nama
+			bpQty = qty
+		}
+	}
+
+	response := map[string]any{
+		"total_revenue":   summary.TotalRevenue,
+		"total_transaksi": summary.TotalTransaksi,
+		"produk_terlaris": bestProduct{
+			Nama:       bpNama,
+			QtyTerjual: bpQty,
+		},
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }

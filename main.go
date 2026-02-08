@@ -64,6 +64,7 @@ func main() {
 	transactionHandler := handlers.NewTransactionHandler(transactionService)
 
 	http.HandleFunc("/api/checkout", transactionHandler.Checkout)
+	http.HandleFunc("/api/report/hari-ini", transactionHandler.SummaryToday)
 
 	// localhost:8080/health
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
