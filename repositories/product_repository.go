@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"kasir-api/models"
 	"log"
 )
@@ -44,16 +45,22 @@ func (repo *ProductRepository) GetAll() ([]models.Product, error) {
 }
 
 // GetAllWithCategory - LEFT JOIN untuk isi field Category di model
-func (repo *ProductRepository) GetAllWithCategory() ([]models.Product, error) {
+func (repo *ProductRepository) GetAllWithCategory(name string) ([]models.Product, error) {
 	query := `
         SELECT p.id, p.name, p.price, p.stock,
                p.category_id,
                c.id, c.name, c.description
         FROM product p
         LEFT JOIN category c ON c.id = p.category_id
-        ORDER BY p.id;
     `
-	rows, err := repo.db.Query(query)
+	fmt.Println("name:", name)
+	var args []interface{}
+	if name != "" {
+		query += " WHERE p.name ILIKE $1"
+		args = append(args, "%"+name+"%")
+	}
+
+	rows, err := repo.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
